@@ -6,12 +6,12 @@
 (defun package-locked-p (package &aux (pkg (find-package package)))
   #+acl
     (or (excl:package-lock pkg)
-        (excl:package-lock-definition pkg))
+        (excl:package-definition-lock pkg))
   #+clisp
     (ext:package-lock pkg)
   #+cmucl
     (or (ext:package-lock pkg)
-        (ext:package-lock-definition pkg))
+        (ext:package-definition-lock pkg))
   #+ecl
     (ext:package-locked-p pkg)
   #+sb-package-locks
@@ -22,12 +22,12 @@
 (defun (setf package-locked-p) (new-value package &aux (pkg (find-package package)))
   #+acl
     (setf (excl:package-lock pkg) new-value
-          (excl:package-lock-definition pkg) new-value)
+          (excl:package-definition-lock pkg) new-value)
   #+clisp
     (setf (ext:package-lock pkg) new-value)
   #+cmucl
     (setf (ext:package-lock pkg) new-value
-          (ext:package-lock-definition pkg) new-value)
+          (ext:package-definition-lock pkg) new-value)
   #+ecl
     (cond (new-value
            (ext:lock-package pkg))
@@ -48,8 +48,8 @@
                              and collect pkg)))
     (unwind-protect
         (funcall body-func)
-      (dolist (pkg locked-pkgs)
-        (setf (package-locked-p pkg) t)))))
+      (loop for pkg in locked-pkgs
+            do (setf (package-locked-p pkg) t)))))
 
 (defmacro without-package-locks (&body body)
   #+acl
@@ -66,9 +66,9 @@
   #-(or acl clisp cmucl ecl sb-package-locks)
     `(progn ,@body))
 
-(defmacro with-unlocked-packages (packages &body body)
+(defmacro with-unlocked-packages ((&rest packages) &body body)
   #+(or acl cmucl)
-    `(with-unlocked-packages/fallback ,packages
+    `(with-unlocked-packages/fallback (quote ,packages)
                                       (lambda () ,@body))
   #+clisp
     `(ext:without-package-lock ,packages ,@body)
