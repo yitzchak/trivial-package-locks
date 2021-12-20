@@ -29,17 +29,14 @@
     (setf (ext:package-lock pkg) new-value
           (ext:package-definition-lock pkg) new-value)
   #+ecl
-    (cond (new-value
-           (ext:lock-package pkg))
-          ((ext:unlock-package pkg)
-           nil))
+    (if new-value
+        (ext:lock-package pkg)
+        (ext:unlock-package pkg))
   #+sb-package-locks
-    (cond (new-value
-           (sb-ext:lock-package pkg))
-          ((sb-ext:unlock-package pkg)
-           nil))
-  #-(or acl clisp cmucl ecl sb-package-locks)
-    new-value)
+    (if new-value
+        (sb-ext:lock-package pkg)
+        (sb-ext:unlock-package pkg))
+  new-value)
 
 (defun with-unlocked-packages/fallback (packages body-func)
   (let ((locked-pkgs (loop for pkg in packages
