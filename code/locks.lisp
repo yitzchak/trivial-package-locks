@@ -74,11 +74,9 @@
     `(progn ,@body))
 
 (defmacro with-unlocked-packages ((&rest packages) &body body)
-  #+(or acl cmucl)
+  #+(or acl clisp cmucl)
     `(with-unlocked-packages/fallback (quote ,packages)
                                       (lambda () ,@body))
-  #+clisp
-    `(ext:without-package-lock ,packages ,@body)
   #+ecl
     `(ext:with-unlocked-packages ,packages ,@body)
   #+sb-package-locks
