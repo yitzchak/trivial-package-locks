@@ -11,8 +11,8 @@ Implementations that support this interface will have the keyword
 `:package-locks` present in `*features*`.
 
 ```common-lisp
-(packaged-locked-p &optional (package *package*)) => lock-state
-(setf (packaged-locked-p &optional (package *package*)) new-lock-state)
+(package-locked-p &optional (package *package*)) => lock-state
+(setf (package-locked-p &optional (package *package*)) new-lock-state)
 ```
 
 Accesses the lock state of a package. `t` indicates that the package is
