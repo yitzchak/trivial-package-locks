@@ -1,18 +1,18 @@
 (in-package #:trivial-package-locks)
 
-#+(or acl clisp cmucl ecl sb-package-locks)
+#+(or allegro clisp cmucl ecl sb-package-locks)
   (pushnew :package-locks *features*)
 
-#+(or acl cmucl ecl sb-package-locks)
+#+(or allegro cmucl ecl sb-package-locks)
   (pushnew :global-package-locks *features*)
 
-#+(or acl sb-package-locks)
+#+(or allegro sb-package-locks)
   (pushnew :implementation-packages *features*)
 
 (defun package-locked-p (&optional (package *package*)
                          &aux (pkg (find-package package)))
   (declare (ignorable package pkg))
-  #+acl
+  #+allegro
     (or (excl:package-lock pkg)
         (excl:package-definition-lock pkg))
   #+clisp
@@ -29,7 +29,7 @@
                                 &optional (package *package*)
                                 &aux (pkg (find-package package)))
   (declare (ignorable package pkg))
-  #+acl
+  #+allegro
     (setf (excl:package-lock pkg) new-value
           (excl:package-definition-lock pkg) new-value)
   #+clisp
@@ -59,7 +59,7 @@
               do (setf (package-locked-p pkg) t)))))
 
 (defmacro without-package-locks (&body body)
-  #+acl
+  #+allegro
     `(excl:without-package-locks ,@body)
   #+clisp
     `(with-unlocked-packages/fallback (list-all-packages)
@@ -70,23 +70,23 @@
     `(ext:without-package-locks ,@body)
   #+sb-package-locks
     `(sb-ext:without-package-locks ,@body)
-  #-(or acl clisp cmucl ecl sb-package-locks)
+  #-(or allegro clisp cmucl ecl sb-package-locks)
     `(progn ,@body))
 
 (defmacro with-unlocked-packages ((&rest packages) &body body)
-  #+(or acl clisp cmucl)
+  #+(or allegro clisp cmucl)
     `(with-unlocked-packages/fallback (quote ,packages)
                                       (lambda () ,@body))
   #+ecl
     `(ext:with-unlocked-packages ,packages ,@body)
   #+sb-package-locks
     `(sb-ext:with-unlocked-packages ,packages ,@body)
-  #-(or acl clisp cmucl ecl sb-package-locks)
+  #-(or allegro clisp cmucl ecl sb-package-locks)
     `(progn ,@body))
 
 (defun package-implementation-packages (&optional (package *package*))
   (declare (ignorable package))
-  #+acl
+  #+allegro
     (mapcar #'find-package (excl:package-implementation-packages (find-package package)))
   #+sb-package-locks
     (sb-ext:package-implemented-by-list (find-package package)))
@@ -94,7 +94,7 @@
 (defun (setf package-implementation-packages) (implementation-packages
                                                &optional (package *package*))
   (declare (ignorable package))
-  #+acl
+  #+allegro
     (setf (excl:package-implementation-packages (find-package package))
           (mapcar #'package-name package))
   #+sb-package-locks
@@ -112,7 +112,7 @@
 (defun package-implements-package-p (implementation-package
                                      &optional (package *package*))
   (declare (ignorable implementation-package package))
-  #+(or acl sb-package-locks)
+  #+(or allegro sb-package-locks)
     (and (member (find-package implementation-package)
                  (package-implementation-packages package))
          t))
@@ -120,10 +120,10 @@
 (defun (setf package-implements-package-p) (new-value implementation-package
                                             &optional (package *package*))
   (declare (ignorable implementation-package package))
-  #+(or acl sb-package-locks)
+  #+(or allegro sb-package-locks)
     (let ((impl-pkg (find-package implementation-package))
           (pkg (find-package package)))
-      #+acl
+      #+allegro
         (setf (excl:package-implementation-packages pkg)
               (if new-value
                   (pushnew (package-name implementation-package)

@@ -15,7 +15,8 @@
                                        (second exports-binding)
                                        (symbol-name (gensym)))
                 collect (list package-var `(make-package ,package-name))
-                collect (list exports-var `(list (intern ,exports-name ,package-var))))
+                when exports-var
+                  collect (list exports-var `(list (intern ,exports-name ,package-var))))
      ,@(loop for (package-binding exports-binding) on vars by #'cddr
              collect `(export ,(if (listp exports-binding)
                                    (first exports-binding)
@@ -25,7 +26,7 @@
                                     package-binding)))
      ,@body))
 
-(define-test package-locked-p.1
+(define-test package-locked-p
   (with-test-packages (pkg exp)
     (false (trivial-package-locks:package-locked-p pkg))
     (true (setf (trivial-package-locks:package-locked-p pkg) t))
@@ -39,7 +40,7 @@
     (true (unexport exp pkg))
     (true (delete-package pkg))))
 
-(define-test without-package-locks.1
+(define-test without-package-locks
   (with-test-packages (pkg exp)
     (false (trivial-package-locks:package-locked-p pkg))
     (true (setf (trivial-package-locks:package-locked-p pkg) t))
@@ -57,7 +58,7 @@
     (false (setf (trivial-package-locks:package-locked-p pkg) nil))
     (true (delete-package pkg))))
 
-(define-test with-unlocked-packages.1
+(define-test with-unlocked-packages
   (with-test-packages ((pkg "FU") exp)
     (false (trivial-package-locks:package-locked-p pkg))
     (true (setf (trivial-package-locks:package-locked-p pkg) t))
@@ -74,4 +75,21 @@
       (true (trivial-package-locks:package-locked-p pkg))
     (false (setf (trivial-package-locks:package-locked-p pkg) nil))
     (true (delete-package pkg))))
+
+(define-test package-implements-package-p
+  (skip-on ((not implementation-packages)) "Implementation package not supported")
+  (with-test-packages (pkg nil *package* nil)
+    (false (setf (trivial-package-locks:package-locked-p pkg) nil))
+    (false (trivial-package-locks:package-locked-p pkg))
+    (true (setf (trivial-package-locks:package-locked-p pkg) t))
+    (true (trivial-package-locks:package-locked-p pkg))
+    (false (trivial-package-locks:package-implements-package-p *package* pkg))
+    (fail (intern "FU" pkg))
+    (true (setf (trivial-package-locks:package-implements-package-p *package* pkg) t))
+    (true (trivial-package-locks:package-implements-package-p *package* pkg))
+    (true (intern "FU" pkg))
+    (false (setf (trivial-package-locks:package-locked-p pkg) nil))
+    (true (delete-package pkg))
+    (true (delete-package *package*))))
+
 
