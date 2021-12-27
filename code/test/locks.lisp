@@ -76,6 +76,17 @@
     (false (setf (trivial-package-locks:package-locked-p pkg) nil))
     (true (delete-package pkg))))
 
+(define-test with-locked-packages
+  (skip-on ((not package-locks)) "Package locks not supported")
+  (with-test-packages ((pkg "FU") exp)
+    (false (trivial-package-locks:package-locked-p pkg))
+    (trivial-package-locks:with-locked-packages ("FU")
+      (true (trivial-package-locks:package-locked-p pkg))
+      (fail (unexport exp pkg)))
+    (false (trivial-package-locks:package-locked-p pkg))
+    (true (unexport exp pkg))
+    (true (delete-package pkg))))
+
 (define-test package-implements-package-p
   (skip-on ((not implementation-packages)) "Implementation package not supported")
   (with-test-packages (pkg nil *package* nil)

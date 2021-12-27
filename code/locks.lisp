@@ -48,15 +48,28 @@
   new-value)
 
 (defun with-unlocked-packages/fallback (packages body-func)
-  (let ((locked-pkgs (loop for pkg in (mapcar #'find-package packages)
-                           when (package-locked-p pkg)
-                             do (setf (package-locked-p pkg) nil)
-                             and collect pkg)))
+  (let ((pkgs (loop for designator in packages
+                    for pkg = (find-package designator)
+                    when (package-locked-p pkg)
+                      do (setf (package-locked-p pkg) nil)
+                      and collect pkg)))
     (unwind-protect
         (funcall body-func)
-      (loop for pkg in locked-pkgs
+      (loop for pkg in pkgs
             when (package-name pkg)
               do (setf (package-locked-p pkg) t)))))
+
+(defun with-locked-packages/fallback (packages body-func)
+  (let ((pkgs (loop for designator in packages
+                    for pkg = (find-package designator)
+                    unless (package-locked-p pkg)
+                      do (setf (package-locked-p pkg) t)
+                      and collect pkg)))
+    (unwind-protect
+        (funcall body-func)
+      (loop for pkg in pkgs
+            when (package-name pkg)
+              do (setf (package-locked-p pkg) nil)))))
 
 (defmacro without-package-locks (&body body)
   #+allegro
@@ -81,6 +94,13 @@
     `(ext:with-unlocked-packages ,packages ,@body)
   #+sb-package-locks
     `(sb-ext:with-unlocked-packages ,packages ,@body)
+  #-(or allegro clisp cmucl ecl sb-package-locks)
+    `(progn ,@body))
+
+(defmacro with-locked-packages ((&rest packages) &body body)
+  #+(or allegro clisp cmucl ecl sb-package-locks)
+    `(with-locked-packages/fallback (quote ,packages)
+                                    (lambda () ,@body))
   #-(or allegro clisp cmucl ecl sb-package-locks)
     `(progn ,@body))
 

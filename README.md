@@ -35,6 +35,13 @@ that was locked after the evaluation of `body`.
 Unlocks and relocks each of the named `packages` around the evaluation of
 `body`.
 
+```common-lisp
+(with-locked-packages (&rest packages) &body body) => results
+```
+
+Locks and and then unlocks each of the named `packages` around the evaluation of
+`body`.
+
 ## Implementation Packages Interface
 
 Implementations that support this interface will have the keyword 

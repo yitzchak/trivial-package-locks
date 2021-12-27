@@ -6,5 +6,6 @@
            #:package-implementation-packages
            #:package-locked-p
            #:without-package-locks
+           #:with-locked-packages
            #:with-unlocked-packages))
 
