@@ -59,7 +59,7 @@
     (true (delete-package pkg))))
 
 (define-test with-unlocked-packages
-  (with-test-packages ((pkg "FU") exp)
+  (with-test-packages ((pkg "FUBAR") exp)
     (false (trivial-package-locks:package-locked-p pkg))
     (true (setf (trivial-package-locks:package-locked-p pkg) t))
     #+package-locks
@@ -68,7 +68,7 @@
       (false (trivial-package-locks:package-locked-p pkg))
     #+package-locks
       (fail (unexport exp pkg))
-    (trivial-package-locks:with-unlocked-packages ("FU")
+    (trivial-package-locks:with-unlocked-packages ("FUBAR")
       (false (trivial-package-locks:package-locked-p pkg))
       (true (unexport exp pkg)))
     #+package-locks
@@ -77,30 +77,30 @@
     (true (delete-package pkg))))
 
 (define-test with-locked-packages
-  (skip-on ((not package-locks)) "Package locks not supported")
-  (with-test-packages ((pkg "FU") exp)
-    (false (trivial-package-locks:package-locked-p pkg))
-    (trivial-package-locks:with-locked-packages ("FU")
-      (true (trivial-package-locks:package-locked-p pkg))
-      (fail (unexport exp pkg)))
-    (false (trivial-package-locks:package-locked-p pkg))
-    (true (unexport exp pkg))
-    (true (delete-package pkg))))
+  (skip-on ((not package-locks)) "Package locks are not supported"
+    (with-test-packages ((pkg "QUUX") exp)
+      (false (trivial-package-locks:package-locked-p pkg))
+      (trivial-package-locks:with-locked-packages ("QUUX")
+        (true (trivial-package-locks:package-locked-p pkg))
+        (fail (unexport exp pkg)))
+      (false (trivial-package-locks:package-locked-p pkg))
+      (true (unexport exp pkg))
+      (true (delete-package pkg)))))
 
 (define-test package-implements-package-p
-  (skip-on ((not implementation-packages)) "Implementation package not supported")
-  (with-test-packages (pkg nil *package* nil)
-    (false (setf (trivial-package-locks:package-locked-p pkg) nil))
-    (false (trivial-package-locks:package-locked-p pkg))
-    (true (setf (trivial-package-locks:package-locked-p pkg) t))
-    (true (trivial-package-locks:package-locked-p pkg))
-    (false (trivial-package-locks:package-implements-package-p *package* pkg))
-    (fail (intern "FU" pkg))
-    (true (setf (trivial-package-locks:package-implements-package-p *package* pkg) t))
-    (true (trivial-package-locks:package-implements-package-p *package* pkg))
-    (true (intern "FU" pkg))
-    (false (setf (trivial-package-locks:package-locked-p pkg) nil))
-    (true (delete-package pkg))
-    (true (delete-package *package*))))
+  (skip-on ((not implementation-packages)) "Implementation packages are not supported"
+    (with-test-packages (pkg nil *package* nil)
+      (false (setf (trivial-package-locks:package-locked-p pkg) nil))
+      (false (trivial-package-locks:package-locked-p pkg))
+      (true (setf (trivial-package-locks:package-locked-p pkg) t))
+      (true (trivial-package-locks:package-locked-p pkg))
+      (false (trivial-package-locks:package-implements-package-p *package* pkg))
+      (fail (intern "FU" pkg))
+      (true (setf (trivial-package-locks:package-implements-package-p *package* pkg) t))
+      (true (trivial-package-locks:package-implements-package-p *package* pkg))
+      (true (intern "FU" pkg))
+      (false (setf (trivial-package-locks:package-locked-p pkg) nil))
+      (true (delete-package pkg))
+      (true (delete-package *package*)))))
 
 
