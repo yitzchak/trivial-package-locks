@@ -35,7 +35,7 @@
     #-package-locks
       (false (trivial-package-locks:package-locked-p pkg))
     #+package-locks
-      (fail (unexport exp pkg))
+      (fail (unexport exp pkg) package-error)
     (false (setf (trivial-package-locks:package-locked-p pkg) nil))
     (true (unexport exp pkg))
     (true (delete-package pkg))))
@@ -49,7 +49,7 @@
     #-package-locks
       (false (trivial-package-locks:package-locked-p pkg))
     #+package-locks
-      (fail (unexport exp pkg))
+      (fail (unexport exp pkg) package-error)
     (trivial-package-locks:without-package-locks
       #-global-package-locks (false (trivial-package-locks:package-locked-p pkg))
       (true (unexport exp pkg)))
@@ -67,7 +67,7 @@
     #-package-locks
       (false (trivial-package-locks:package-locked-p pkg))
     #+package-locks
-      (fail (unexport exp pkg))
+      (fail (unexport exp pkg) package-error)
     (trivial-package-locks:with-unlocked-packages ("FUBAR")
       (false (trivial-package-locks:package-locked-p pkg))
       (true (unexport exp pkg)))
@@ -82,7 +82,7 @@
       (false (trivial-package-locks:package-locked-p pkg))
       (trivial-package-locks:with-locked-packages ("QUUX")
         (true (trivial-package-locks:package-locked-p pkg))
-        (fail (unexport exp pkg)))
+        (fail (unexport exp pkg) package-error))
       (false (trivial-package-locks:package-locked-p pkg))
       (true (unexport exp pkg))
       (true (delete-package pkg)))))
@@ -95,7 +95,7 @@
       (true (setf (trivial-package-locks:package-locked-p pkg) t))
       (true (trivial-package-locks:package-locked-p pkg))
       (false (trivial-package-locks:package-implements-package-p *package* pkg))
-      (fail (intern "FU" pkg))
+      (fail (intern "FU" pkg) package-error)
       (true (setf (trivial-package-locks:package-implements-package-p *package* pkg) t))
       (true (trivial-package-locks:package-implements-package-p *package* pkg))
       (true (intern "FU" pkg))
