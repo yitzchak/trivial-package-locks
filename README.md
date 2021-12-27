@@ -39,7 +39,7 @@ Unlocks and relocks each of the named `packages` around the evaluation of
 (with-locked-packages (&rest packages) &body body) => results
 ```
 
-Locks and and then unlocks each of the named `packages` around the evaluation of
+Locks and then unlocks each of the named `packages` around the evaluation of
 `body`.
 
 ## Implementation Packages Interface
