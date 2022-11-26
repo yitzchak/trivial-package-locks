@@ -74,6 +74,9 @@
 (defmacro without-package-locks (&body body)
   #+allegro
     `(excl:without-package-locks ,@body)
+  #+ccl
+    `(let ((ccl:*warn-if-redefine-kernel* nil))
+       ,@body)
   #+clisp
     `(with-unlocked-packages/fallback (list-all-packages)
                                       (lambda () ,@body))
@@ -83,10 +86,11 @@
     `(ext:without-package-locks ,@body)
   #+sb-package-locks
     `(sb-ext:without-package-locks ,@body)
-  #-(or allegro clisp cmucl ecl sb-package-locks)
+  #-(or allegro ccl clisp cmucl ecl sb-package-locks)
     `(progn ,@body))
 
 (defmacro with-unlocked-packages ((&rest packages) &body body)
+  (declare (ignorable packages))
   #+(or allegro clisp cmucl)
     `(with-unlocked-packages/fallback (quote ,packages)
                                       (lambda () ,@body))
@@ -98,6 +102,7 @@
     `(progn ,@body))
 
 (defmacro with-locked-packages ((&rest packages) &body body)
+  (declare (ignorable packages))
   #+(or allegro clisp cmucl ecl sb-package-locks)
     `(with-locked-packages/fallback (quote ,packages)
                                     (lambda () ,@body))

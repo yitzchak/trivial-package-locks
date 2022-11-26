@@ -26,7 +26,9 @@ Disables the checking of package locks during the evaluation of `body`.
 For implementations that do not have the ability to disable all package
 locks via a dynamic variable `(list-all-packages)` will be used to unlock
 each package before the evaluation of `body` and then relock each package
-that was locked after the evaluation of `body`.
+that was locked after the evaluation of `body`. For implementations that
+do not have package locks but have some other mechanism to prevent changes
+to the kernel that mechanism will be disabled.
 
 ```common-lisp
 (with-unlocked-packages (&rest packages) &body body) => results
