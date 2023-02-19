@@ -1,5 +1,7 @@
 (in-package #:trivial-package-locks)
 
+#+ecl (require :package-locks)
+
 #+(or allegro clisp cmucl ecl sb-package-locks)
   (pushnew :package-locks *features*)
 
@@ -47,6 +49,7 @@
         (sb-ext:unlock-package pkg))
   new-value)
 
+#+(or allegro clisp cmucl)
 (defun with-unlocked-packages/fallback (packages body-func)
   (let ((pkgs (loop for designator in packages
                     for pkg = (find-package designator)
@@ -59,6 +62,7 @@
             when (package-name pkg)
               do (setf (package-locked-p pkg) t)))))
 
+#+(or allegro clisp cmucl ecl sb-package-locks)
 (defun with-locked-packages/fallback (packages body-func)
   (let ((pkgs (loop for designator in packages
                     for pkg = (find-package designator)

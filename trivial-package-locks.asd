@@ -5,7 +5,6 @@
   :version "0.1"
   :homepage "https://github.com/yitzchak/trivial-package-locks"
   :bug-tracker "https://github.com/yitzchak/trivial-package-locks/issues"
-  :depends-on ((:feature :ecl #:package-locks))
   :in-order-to ((asdf:test-op (asdf:test-op #:trivial-package-locks/test)))
   :components
     ((:module code
