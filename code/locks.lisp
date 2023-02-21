@@ -98,11 +98,14 @@
   #+(or allegro clisp cmucl)
     `(with-unlocked-packages/fallback (quote ,packages)
                                       (lambda () ,@body))
+  #+ccl
+    `(let ((ccl:*warn-if-redefine-kernel* nil))
+       ,@body)
   #+ecl
     `(ext:with-unlocked-packages ,packages ,@body)
   #+sb-package-locks
     `(sb-ext:with-unlocked-packages ,packages ,@body)
-  #-(or allegro clisp cmucl ecl sb-package-locks)
+  #-(or allegro ccl clisp cmucl ecl sb-package-locks)
     `(progn ,@body))
 
 (defmacro with-locked-packages ((&rest packages) &body body)
@@ -110,7 +113,10 @@
   #+(or allegro clisp cmucl ecl sb-package-locks)
     `(with-locked-packages/fallback (quote ,packages)
                                     (lambda () ,@body))
-  #-(or allegro clisp cmucl ecl sb-package-locks)
+  #+ccl
+    `(let ((ccl:*warn-if-redefine-kernel* t))
+       ,@body)
+  #-(or allegro ccl clisp cmucl ecl sb-package-locks)
     `(progn ,@body))
 
 (defun package-implementation-packages (&optional (package *package*))
