@@ -7,5 +7,6 @@
            #:package-locked-p
            #:without-package-locks
            #:with-locked-packages
-           #:with-unlocked-packages))
+           #:with-unlocked-packages
+           #:with-unlocked-system-packages))
 
