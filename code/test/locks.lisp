@@ -31,11 +31,11 @@
     (false (trivial-package-locks:package-locked-p pkg))
     (true (setf (trivial-package-locks:package-locked-p pkg) t))
     #+package-locks
-      (true (trivial-package-locks:package-locked-p pkg))
+    (true (trivial-package-locks:package-locked-p pkg))
     #-package-locks
-      (false (trivial-package-locks:package-locked-p pkg))
+    (false (trivial-package-locks:package-locked-p pkg))
     #+package-locks
-      (fail (unexport exp pkg) package-error)
+    (fail (unexport exp pkg) package-error)
     (false (setf (trivial-package-locks:package-locked-p pkg) nil))
     (true (unexport exp pkg))
     (true (delete-package pkg))))
@@ -45,16 +45,16 @@
     (false (trivial-package-locks:package-locked-p pkg))
     (true (setf (trivial-package-locks:package-locked-p pkg) t))
     #+package-locks
-      (true (trivial-package-locks:package-locked-p pkg))
+    (true (trivial-package-locks:package-locked-p pkg))
     #-package-locks
-      (false (trivial-package-locks:package-locked-p pkg))
+    (false (trivial-package-locks:package-locked-p pkg))
     #+package-locks
-      (fail (unexport exp pkg) package-error)
+    (fail (unexport exp pkg) package-error)
     (trivial-package-locks:without-package-locks
       #-global-package-locks (false (trivial-package-locks:package-locked-p pkg))
       (true (unexport exp pkg)))
     #+package-locks
-      (true (trivial-package-locks:package-locked-p pkg))
+    (true (trivial-package-locks:package-locked-p pkg))
     (false (setf (trivial-package-locks:package-locked-p pkg) nil))
     (true (delete-package pkg))))
 
@@ -63,16 +63,16 @@
     (false (trivial-package-locks:package-locked-p pkg))
     (true (setf (trivial-package-locks:package-locked-p pkg) t))
     #+package-locks
-      (true (trivial-package-locks:package-locked-p pkg))
+    (true (trivial-package-locks:package-locked-p pkg))
     #-package-locks
-      (false (trivial-package-locks:package-locked-p pkg))
+    (false (trivial-package-locks:package-locked-p pkg))
     #+package-locks
-      (fail (unexport exp pkg) package-error)
+    (fail (unexport exp pkg) package-error)
     (trivial-package-locks:with-unlocked-packages ("FUBAR")
       (false (trivial-package-locks:package-locked-p pkg))
       (true (unexport exp pkg)))
     #+package-locks
-      (true (trivial-package-locks:package-locked-p pkg))
+    (true (trivial-package-locks:package-locked-p pkg))
     (false (setf (trivial-package-locks:package-locked-p pkg) nil))
     (true (delete-package pkg))))
 
