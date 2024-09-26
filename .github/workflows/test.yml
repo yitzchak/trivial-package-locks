@@ -1,0 +1,39 @@
+name: test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test:
+    name: ${{ matrix.lisp }}
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        lisp:
+        - abcl
+        - ccl
+        - clisp
+        - cmucl
+        - clasp
+        - ecl
+        - mkcl
+        - sbcl
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/yitzchak/archlinux-cl:latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    - name: Setup Lisp Environment
+      run: |
+        make-rc
+        asdf-add
+    - name: Run Tests
+      run: |
+        lisp -i ${{ matrix.lisp }} -e "(ql:quickload :trivial-package-locks/test)" -e "(defparameter cl-user::*exit-on-test-failures* t)" -e "(asdf:test-system :trivial-package-locks)"
