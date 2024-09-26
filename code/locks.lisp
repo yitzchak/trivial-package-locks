@@ -61,7 +61,7 @@
       (sb-ext:unlock-package pkg))
   new-value)
 
-#+(or allegro clisp cmucl)
+#+(or allegro clisp cmucl (and clasp package-locks))
 (defun with-unlocked-packages/fallback (packages body-func)
   (let ((pkgs (loop for designator in packages
                     for pkg = (find-package designator)
@@ -93,6 +93,9 @@
   #+ccl
   `(let ((ccl:*warn-if-redefine-kernel* nil))
      ,@body)
+  #+(and clasp package-locks)
+  `(with-unlocked-packages/fallback (list-all-packages)
+     (lambda () ,@body))
   #+clisp
   `(with-unlocked-packages/fallback (list-all-packages)
      (lambda () ,@body))
@@ -102,7 +105,7 @@
   `(ext:without-package-locks ,@body)
   #+sb-package-locks
   `(sb-ext:without-package-locks ,@body)
-  #-(or allegro ccl clisp cmucl ecl sb-package-locks)
+  #-(or allegro ccl (and clasp package-locks) clisp cmucl ecl sb-package-locks)
   `(progn ,@body))
 
 (defmacro with-unlocked-system-packages (&body body)
